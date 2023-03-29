@@ -1,0 +1,21 @@
+open models/R1138v2_structure_23v2_6hbc_mature.pdb_DOCKED.pdb
+open models/R1138TS232_4.pdb_DOCKED.pdb
+open models/R1138TS054_1.pdb_DOCKED.pdb
+open models/R1138TS238_1.pdb_DOCKED.pdb
+open models/R1138v2_6HBC-Mature.mrc_CENTERED.mrc
+
+set bgColor white
+volume copy #5
+volume copy #5
+volume copy #5
+color #1 green
+color #2-4 blue
+volume #5-8 sdlevel 10
+color #5-8 grey trans 50
+move x -150 models #1,5
+move x -50 models #2,6
+move x 50 models #3,7
+move x 150 models #4,8
+show #!5 models
+view matrix camera 0.99895,0.017732,-0.042138,168.78,-0.042528,0.022198,-0.99885,-555.94,-0.016776,0.9996,0.022928,219.86
+save EM_bad_example.png pixelsize 0.05 transparentBackground true
