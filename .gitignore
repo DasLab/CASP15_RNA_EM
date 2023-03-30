@@ -3,3 +3,12 @@ __pycache__/
 *png
 *svg
 results/models
+results/atom_inclusion_chimerax.py
+results/Untitled.ipynb
+casp_rna_em/R11*
+todo
+mask.ccp4
+fsc_model.unmasked.mtriage.log
+fsc_model.masked.mtriage.log
+results/230329_EM_for_Ramya.csv
+*.~lock
