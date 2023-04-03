@@ -7,17 +7,23 @@ For the CASP15 RNA category, we aimed to assess predictions by directly comparin
 
 #### Python packages
 
+To install all necessary python packages, in this repository run:
+
 `conda env create -f environment.yml`
+
 This will also install [__TEMPy__](https://doi.org/10.1107/s2059798320014928) and [__rna-tools__](https://rna-tools.readthedocs.io/en/latest/).
+
+To run this code always activate the appropriate conda environment before running.
+
 `conda activate casp_rna_em`
 
 #### Phenix
 
 Obtain an [academic liscense](https://phenix-online.org/phenix_request/index.cgi) and [download](https://phenix-online.org/download/) phenix. Install according to instruction, for example for linux:
-'''
+```
 tar -xf phenix-installer-*.tar.gz
 ./install --prefix="desired_location"
-'''
+```
 
 You can either add `source desired_location/phenix-?.??.?-????/phenix_env.sh` to your `~/.bashrc` or in applicable function calls in this repository specify `phenix_location='desired_location/phenix-?.??.?-????/build/bin/'`.
 
@@ -29,9 +35,7 @@ There are models whose geometries surpass the checks of phenix. They will crash 
 
 #### ChimeraX
 
-Download, agreeing to non-commerical liscence, and install according to the instructions for your opperating system [ChimeraX](https://www.cgl.ucsf.edu/chimerax/download.html). You can either add `alias ChimeraX='chimerax-location/bin/Chimerax'` or in applicable function calls in this repository specify `chimerax_exec='chimerax-location/bin/Chimerax'`
-
-# TODO make sure can do chimerax='' defaults
+[Download](https://www.cgl.ucsf.edu/chimerax/download.html), agreeing to non-commerical liscence, and install according to the instructions for your opperating system ChimeraX. You can either add `alias ChimeraX='chimerax-location/bin/Chimerax'` or in applicable function calls in this repository specify `chimerax_location='chimerax-location/bin/'`
 
 #### Qscore
 
@@ -41,29 +45,38 @@ _Section under construction_.
 
 #### US-align
 
-'''
+Simply install according to:
+
+```
 git clone https://github.com/pylelab/USalign.git
 cd USalign
 make
-'''
+```
+You can either add `export PATH=$PATH:/location/USalign` to your `~/.bashrc` or in applicable function calls in this repository specify `usalign_location='/location/USalign'`.
+
 
 #### LGA
 
 Request [LGA download](http://as2ts.proteinmodel.org/AS2TS/Download_code/).
-'''
+```
 tar -xf LGA_package_src.*.tar.gz
 cd LGA_package_src/
-'''
+```
 Add to you `~/.bashrc`:
-'''
+```
 export PATH=$PATH:lga-location
 ulimit -s unlimited; lga
-''' 
-
+``` 
 
 ## Pipeline
 
+_Section under construction_.
+
+
 ## Analysis
+
+_Section under construction_.
+
 
 ### Choosing best score
 Code can be found in `results/rna_results_utils.py`
