@@ -9,8 +9,7 @@ from glob import glob
 # TODO
 ###############################################################################
 # code
-#   push edits
-#    so default = '' to loc and usalign
+#   push analysis edits
 
 # Testing
 #   test sbatch on sherlock
