@@ -5,19 +5,61 @@ For the CASP15 RNA category, we aimed to assess predictions by directly comparin
 
 ### Programs used
 
+#### Python packages
+
+`conda env create -f environment.yml`
+This will also install [__TEMPy__](https://doi.org/10.1107/s2059798320014928) and [__rna-tools__](https://rna-tools.readthedocs.io/en/latest/).
+`conda activate casp_rna_em`
+
 #### Phenix
 
-Install phenix from https://phenix-online.org/download
+Obtain an [academic liscense](https://phenix-online.org/phenix_request/index.cgi) and [download](https://phenix-online.org/download/) phenix. Install according to instruction, for example for linux:
+'''
+tar -xf phenix-installer-*.tar.gz
+./install --prefix="desired_location"
+'''
 
-#### TEMPy
+You can either add `source desired_location/phenix-?.??.?-????/phenix_env.sh` to your `~/.bashrc` or in applicable function calls in this repository specify `phenix_location='desired_location/phenix-?.??.?-????/build/bin/'`.
 
-`pip install BioTEMPy==2.0.0`
+The binaries used are `phenix.clashscore`, `phenix.rna_validate`, `phenix.model_vs_map`, `phenix.mtriage`, and `phenix.dock_in_map`.
+
+Versions 1.18.2 and 1.20.1 (linux) were tested.
+
+There are models whose geometries surpass the checks of phenix. They will crash phenix and not recieve phenix scores. This can be manually overwritten if desired by changing `max_reasonable_bond_distance` in `master_params_str` to `100` in `phenix_location/modules/cctbx_project/mmtbx/monomer_library/pdb_interpretation.py`
+
+#### ChimeraX
+
+Download, agreeing to non-commerical liscence, and install according to the instructions for your opperating system [ChimeraX](https://www.cgl.ucsf.edu/chimerax/download.html). You can either add `alias ChimeraX='chimerax-location/bin/Chimerax'` or in applicable function calls in this repository specify `chimerax_exec='chimerax-location/bin/Chimerax'`
+
+# TODO make sure can do chimerax='' defaults
 
 #### Qscore
 
-`git clone https://github.com/gregdp/mapq.git`
+Qscores were calculated but not used in the final ranking because of the low resolution of the maps. 
 
-#### Chimera
+_Section under construction_.
+
+#### US-align
+
+'''
+git clone https://github.com/pylelab/USalign.git
+cd USalign
+make
+'''
+
+#### LGA
+
+Request [LGA download](http://as2ts.proteinmodel.org/AS2TS/Download_code/).
+'''
+tar -xf LGA_package_src.*.tar.gz
+cd LGA_package_src/
+'''
+Add to you `~/.bashrc`:
+'''
+export PATH=$PATH:lga-location
+ulimit -s unlimited; lga
+''' 
+
 
 ## Pipeline
 

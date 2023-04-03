@@ -1,0 +1,19 @@
+name: casp_rna_em
+dependencies:
+  - python=3.10
+  - pip
+  - numpy
+  - scipy
+  - pandas
+  - matplotlib
+  - seaborn
+  - jupyter
+  - jupyterlab
+  - biopandas
+  #- mrcfile
+  #- biopython=1.73
+  #- pyFFTW
+  - pip:
+    - BioTEMPy==2.0.0 
+    - rna-tools
+    - .
