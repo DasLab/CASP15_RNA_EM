@@ -5,16 +5,16 @@ from os import system, path
 from tqdm import tqdm
 
 
-def score_all_from_file(file, out_file_prefix, native, usalign_exec='', chimerax_exec='', EM=True, emmap=None, resolution=None, threshold=None, phenix_location=""):
+def score_all_from_file(file, out_file_prefix, native, usalign_location='', chimerax_location='', EM=True, emmap=None, resolution=None, threshold=None, phenix_location=""):
     pdbs = []
     with open(file, 'r') as f:
         for line in f.readlines():
             pdbs.append(line.strip())
-    score_all(pdbs, out_file_prefix=out_file_prefix, native=native, usalign_exec=usalign_exec,
-              chimerax_exec=chimerax_exec, EM=EM, emmap=emmap, resolution=resolution, threshold=threshold, phenix_location=phenix_location)
+    score_all(pdbs, out_file_prefix=out_file_prefix, native=native, usalign_location=usalign_location,
+              chimerax_location=chimerax_location, EM=EM, emmap=emmap, resolution=resolution, threshold=threshold, phenix_location=phenix_location)
 
 
-def score_all(pdbs, out_file_prefix, native, usalign_exec='', chimerax_exec='', EM=True, emmap=None, resolution=None, threshold=None, phenix_location=""):
+def score_all(pdbs, out_file_prefix, native, usalign_location='', chimerax_location='', EM=True, emmap=None, resolution=None, threshold=None, phenix_location=""):
 
     single_scores = {}
     per_residue_scores = {}
@@ -26,16 +26,16 @@ def score_all(pdbs, out_file_prefix, native, usalign_exec='', chimerax_exec='', 
         score_dict.update(run_phenix_clashscore(pdb, phenix_location=phenix_location))
         score_dict.update(run_phenix_rna_validate(pdb, phenix_location=phenix_location))
         score_dict.update(run_lga(pdb, native, atom='C4,'))
-        score_dict.update(run_usalign(pdb, native, usalign_exec=usalign_exec))
+        score_dict.update(run_usalign(pdb, native, usalign_location=usalign_location))
 
         if EM:
             # TODO add skip USalign if that pdb already exists.
             # TODO phenix option for docking
             # TODO add all scores (fsc, Q), maybe option of score to not do?
-            score_dict.update(dock_pdb_usalign_fitmap(pdb, emmap, native, threshold, usalign_exec, chimerax_exec))
+            score_dict.update(dock_pdb_usalign_fitmap(pdb, emmap, native, threshold, usalign_location, chimerax_location))
             docked_pdb = f'{pdb.rsplit(".",1)[0]}_{emmap.rsplit(".",1)[0].rsplit("/",1)[-1]}_usalignfitmapDOCKED.pdb'
             score_dict.update(run_phenix_cc(docked_pdb, emmap, resolution=resolution, phenix_location=phenix_location))
-            score_dict.update(run_atomic_inclusion(docked_pdb, emmap, threshold, chimerax_exec))
+            score_dict.update(run_atomic_inclusion(docked_pdb, emmap, threshold, chimerax_location))
             score_dict.update(run_tempy(docked_pdb, emmap, resolution))
 
         single_score = {key: score_dict[key] for key in score_dict if "per_residue" not in key and "per_threshold" not in key}
@@ -140,12 +140,12 @@ def run_phenix_fsc(pdb, emmap, phenix_location='', result_file=None):
     return parse_phenix_fsc(result_file)
 
 
-def run_atomic_inclusion(pdb, emmap, threshold, chimerax_exec, result_file=None):
+def run_atomic_inclusion(pdb, emmap, threshold, chimerax_location='', result_file=None):
     prefix = f'{pdb.rsplit(".",1)[0]}'
     if result_file is None:
         result_file = f'{prefix}_AI.out'
 
-    system(f'{chimerax_exec} --nogui --script "{path.dirname(__file__)}/chimerax_atom_inclusion.py {emmap} {pdb} {threshold} {prefix}" > {result_file}')
+    system(f'{chimerax_location}ChimeraX --nogui --script "{path.dirname(__file__)}/chimerax_atom_inclusion.py {emmap} {pdb} {threshold} {prefix}" > {result_file}')
 
     return parse_atomic_inclusion(result_file, prefix, threshold)
 
@@ -231,12 +231,12 @@ def run_lga(pdb, native, atom='C4,', result_file=None):
     return parse_lga(result_file)
 
 
-def run_usalign(pdb, native, usalign_exec, output_pdb=None, result_file=None):
+def run_usalign(pdb, native, usalign_location='', output_pdb=None, result_file=None):
     if result_file is None:
         result_file = f'{pdb.rsplit(".",1)[0]}_{native.rsplit(".",1)[0].rsplit("/",1)[-1]}_USALIGN.out'
     if output_pdb is None:
         output_pdb = f'{pdb.rsplit(".",1)[0]}_{native.rsplit(".",1)[0].rsplit("/",1)[-1]}_USALIGN'
-    command = [usalign_exec, pdb, native, '-outfmt', '2', '-o', output_pdb]
+    command = [f'{usalign_location}USalign', pdb, native, '-outfmt', '2', '-o', output_pdb]
     out_file = open(result_file, 'w')
     p = sp.Popen(command, stdout=out_file, stderr=sp.PIPE)
     out, err = p.communicate()
@@ -466,14 +466,14 @@ def dock_pdb_phenix(pdb, emmap, resolution, phenix_location='', output_pdb=None,
     out_file.close()
 
 
-def dock_pdb_usalign_fitmap(pdb, emmap, native, threshold, usalign_exec, chimerax_exec, output_pdb=None, result_file=None):
+def dock_pdb_usalign_fitmap(pdb, emmap, native, threshold, usalign_location='', chimerax_location='', output_pdb=None, result_file=None):
     if output_pdb is None:
         output_pdb = f'{pdb.rsplit(".",1)[0]}_{emmap.rsplit(".",1)[0].rsplit("/",1)[-1]}_usalignfitmapDOCKED.pdb'
     if result_file is None:
         result_file = f'{pdb.rsplit(".",1)[0]}_{emmap.rsplit(".",1)[0].rsplit("/",1)[-1]}_usalignfitmapDOCKED.out'
-    run_usalign(pdb, native, usalign_exec)
+    run_usalign(pdb, native, usalign_location)
     usalign_output_pdb = f'{pdb.rsplit(".",1)[0]}_{native.rsplit(".",1)[0].rsplit("/",1)[-1]}_USALIGN.pdb'
-    system(f'{chimerax_exec} --nogui --script "{path.dirname(__file__)}/chimerax_fit.py {usalign_output_pdb} {emmap} {output_pdb} {threshold}" > {result_file}')
+    system(f'{chimerax_location}ChimeraX --nogui --script "{path.dirname(__file__)}/chimerax_fit.py {usalign_output_pdb} {emmap} {output_pdb} {threshold}" > {result_file}')
     return {'docked': 'usalign-fitmap'}
 
 # run_phenix_rna_validate('R1107TS147_1.pdb',phenix_location='/home/rachael/phenix_1.20/phenix-1.20.1-4487/build/bin/')

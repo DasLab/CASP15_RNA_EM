@@ -85,7 +85,7 @@ def center_map_and_native(emmap, pdb):
     ppdb.to_pdb(path=pdb)
 
 
-def write_and_sbatch_scoring(pdbs, N, prefix, name, base_sbatch, out_file_prefix, native, usalign_exec, EM, phenix_location, chimerax_exec=None, emmap=None, resolution=None, threshold=None,
+def write_and_sbatch_scoring(pdbs, N, prefix, name, base_sbatch, out_file_prefix, native, usalign_location, EM, phenix_location, chimerax_location=None, emmap=None, resolution=None, threshold=None,
                              sbatch=True):
     seperate_pdbs_to_run_groups(pdbs, N, prefix)
     for i in range(N):
@@ -94,9 +94,9 @@ def write_and_sbatch_scoring(pdbs, N, prefix, name, base_sbatch, out_file_prefix
         with open(f'{prefix}_{i}.sbatch', 'a') as f:
             #f.write('\nconda activate casp_rna_em \n')
             if EM:
-                f.write(f'python {path.dirname(__file__)}/casp_rna_score_all_from_file.py -f {prefix}_{i}.txt --out_file_prefix {out_file_prefix}_{i} --native {native} --usalign_exec {usalign_exec} --chimerax_exec {chimerax_exec} --EM --emmap {emmap} --resolution {resolution} --threshold {threshold} --phenix_location {phenix_location} \n')
+                f.write(f'python {path.dirname(__file__)}/casp_rna_score_all_from_file.py -f {prefix}_{i}.txt --out_file_prefix {out_file_prefix}_{i} --native {native} --usalign_location {usalign_location} --chimerax_location {chimerax_location} --EM --emmap {emmap} --resolution {resolution} --threshold {threshold} --phenix_location {phenix_location} \n')
             else:
-                f.write(f'python {path.dirname(__file__)}/casp_rna_score_all_from_file.py -f {prefix}_{i}.txt --out_file_prefix {out_file_prefix}_{i} --native {native} --usalign_exec {usalign_exec} --phenix_location {phenix_location} \n')
+                f.write(f'python {path.dirname(__file__)}/casp_rna_score_all_from_file.py -f {prefix}_{i}.txt --out_file_prefix {out_file_prefix}_{i} --native {native} --usalign_location {usalign_location} --phenix_location {phenix_location} \n')
         if sbatch:
             system(f'sbatch {prefix}_{i}.sbatch')
         else:

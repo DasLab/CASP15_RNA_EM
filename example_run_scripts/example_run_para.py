@@ -9,8 +9,8 @@ from glob import glob
 #   combine output after run -- new script
 
 
-usalign_exec = '/home/anthony/USalign/USalign'
-chimerax_exec = '/home/anthony/chimerax-1.6-rc2023.03.31//bin/ChimeraX'
+usalign_location = '/home/anthony/USalign/'
+chimerax_location = '/home/anthony/chimerax-1.6-rc2023.03.31//bin/'
 phenix_location = '/home/anthony/phenix-1.20.1-4487/build/bin/'
 
 cwd = '/home/anthony/Desktop/CASP/script_test'
@@ -44,15 +44,15 @@ def run_all_on_target(tar_file, natives, models_folder, name,
                         if center:
                             center_map_and_native(emmap, native)
                         print(f'Scoring models (EM) in {models_folder}, {native}, {emmap}.')
-                        write_and_sbatch_scoring(pdbs, N, f'run_files/run_{name}', name, base_sbatch, f"result_files/{name}_{i}-{j}", native, usalign_exec=usalign_exec, chimerax_exec=chimerax_exec, EM=EM, emmap=emmap, resolution=resolution[emmap], threshold=threshold[emmap], phenix_location=phenix_location, sbatch=sbatch)
+                        write_and_sbatch_scoring(pdbs, N, f'run_files/run_{name}', name, base_sbatch, f"result_files/{name}_{i}-{j}", native, usalign_location=usalign_location, chimerax_location=chimerax_location, EM=EM, emmap=emmap, resolution=resolution[emmap], threshold=threshold[emmap], phenix_location=phenix_location, sbatch=sbatch)
                     else:
                         print(f'Scoring models in {models_folder}, {native}, {emmap}.')
-                        write_and_sbatch_scoring(pdbs, N, f'run_files/run_{name}', name, base_sbatch, f"result_files/{name}_{i}-{j}", native, usalign_exec=usalign_exec, EM=False, phenix_location=phenix_location, sbatch=sbatch)
+                        write_and_sbatch_scoring(pdbs, N, f'run_files/run_{name}', name, base_sbatch, f"result_files/{name}_{i}-{j}", native, usalign_location=usalign_location, EM=False, phenix_location=phenix_location, sbatch=sbatch)
         else:
             for i, native in enumerate(natives):
                 native = f'{models_folder}/{name}TSexp_{i}.pdb'
                 print(f'Scoring models in {models_folder}, {native}.')
-                write_and_sbatch_scoring(pdbs, N, f'run_files/run_{name}', name, base_sbatch, f"result_files/{name}_{i}", native, usalign_exec=usalign_exec, EM=EM, phenix_location=phenix_location, sbatch=sbatch)
+                write_and_sbatch_scoring(pdbs, N, f'run_files/run_{name}', name, base_sbatch, f"result_files/{name}_{i}", native, usalign_location=usalign_location, EM=EM, phenix_location=phenix_location, sbatch=sbatch)
 
 
 ###############################################################################

@@ -10,10 +10,9 @@ from glob import glob
 ###############################################################################
 # code
 #   push edits
-#   chimerax so default = '' to loc and usalign
+#    so default = '' to loc and usalign
 
 # Testing
-#   Z score columns and reduce
 #   test sbatch on sherlock
 #   production run
 
@@ -34,8 +33,8 @@ from glob import glob
 ###############################################################################
 
 
-usalign_exec = '/home/anthony/USalign/USalign'
-chimerax_exec = '/home/anthony/chimerax-1.6-rc2023.03.31//bin/ChimeraX'
+usalign_location = '/home/anthony/USalign/'
+chimerax_location = '/home/anthony/chimerax-1.6-rc2023.03.31//bin/'
 phenix_location = '/home/anthony/phenix-1.20.1-4487/build/bin/'
 
 cwd = '/home/anthony/Desktop/CASP/data'
@@ -70,15 +69,15 @@ def run_all_on_target(tar_file, natives, models_folder, name,
                         if center:
                             center_map_and_native(emmap, native)
                         print(f'Scoring models (EM) in {models_folder}, {native}, {emmap}.')
-                        score_all(pdbs, f"result_files/{name}_{i}-{j}", native, usalign_exec=usalign_exec, EM=EM, emmap=emmap, resolution=resolution[emmap], threshold=threshold[emmap], chimerax_exec=chimerax_exec, phenix_location=phenix_location)
+                        score_all(pdbs, f"result_files/{name}_{i}-{j}", native, usalign_location=usalign_location, EM=EM, emmap=emmap, resolution=resolution[emmap], threshold=threshold[emmap], chimerax_location=chimerax_location, phenix_location=phenix_location)
                     else:
                         print(f'Scoring models in {models_folder}, {native}, {emmap}.')
-                        score_all(pdbs, f"result_files/{name}_{i}-{j}", native, usalign_exec=usalign_exec, EM=False, phenix_location=phenix_location)
+                        score_all(pdbs, f"result_files/{name}_{i}-{j}", native, usalign_location=usalign_location, EM=False, phenix_location=phenix_location)
         else:
             for i, native in enumerate(natives):
                 native = f'{models_folder}/{name}TSexp_{i}.pdb'
                 print(f'Scoring models in {models_folder}, {native}.')
-                score_all(pdbs, f"result_files/{name}_{i}", native, usalign_exec=usalign_exec, EM=EM, phenix_location=phenix_location)
+                score_all(pdbs, f"result_files/{name}_{i}", native, usalign_location=usalign_location, EM=EM, phenix_location=phenix_location)
 
 
 ###############################################################################
@@ -148,7 +147,7 @@ run_all_on_target(tar_file=f'{cwd}/R1126.tar.gz',
                   name="R1126",
                   EM=True,
                   prepare=False,
-                  run=True,
+                  run=False,
                   resolution={f'{cwd}/R1126_structure_21.mrc': 5.6},
                   threshold={f'{cwd}/R1126_structure_21.mrc': 0.11},
                   N=3)
@@ -327,5 +326,7 @@ Z_topo = {"tm": 1 / 2, "gdt_ts": 1 / 2}
 df["Z_em"] = get_weighted_sum_z(df, Z_em, "Z_")
 df["Z_topo"] = get_weighted_sum_z(df, Z_topo, "Z_")
 df.to_csv('all_scores_best_per_group_withZ.pdb', index=False)
-clean_columns = ['target', 'gr_code', 'cc_mask', 'cc_peaks', 'tempy_mi', 'tempy_smoc', 'ai', "tm", "gdt_ts"]
+clean_columns = ['target', 'gr_code', 'cc_mask', 'cc_peaks', 'tempy_mi', 'tempy_smoc', 'ai', "tm", "gdt_ts",
+                 'Z_cc_mask', 'Z_cc_peaks', 'Z_tempy_mi', 'Z_tempy_smoc', 'Z_ai', "Z_tm", "Z_gdt_ts",
+                 'Z_em', 'Z_topo']
 df[clean_columns].to_csv('all_scores_best_per_group_withZ_clean.pdb', index=False)
