@@ -9,14 +9,15 @@ from glob import glob
 # TODO
 ###############################################################################
 # code
-#   push analysis edits
+#   update images in document and folder
+#   move in visualization code for all_per_thershold and all_per_residue
 
 # Testing
 #   test sbatch on sherlock
 #   production run
 
 # Documentation
-#   pipeline
+#   docstring
 
 # Later:
 #   options to run: ddsr, qscore, fsc
@@ -117,7 +118,7 @@ run_all_on_target(tar_file=f'{cwd}/R1116.tar.gz',
                   N=None)
 
 ###############################################################################
-# R1117
+# R1117 ~8.2s/pdb
 ###############################################################################
 
 run_all_on_target(tar_file=f'{cwd}/R1117.tar.gz',
@@ -125,7 +126,7 @@ run_all_on_target(tar_file=f'{cwd}/R1117.tar.gz',
                   models_folder=f'{cwd}/R1117',
                   name="R1117",
                   prepare=False,
-                  run=False,
+                  run=True,
                   N=2)
 
 run_all_on_target(tar_file=f'{cwd}/R1117v2.tar.gz',
@@ -137,7 +138,7 @@ run_all_on_target(tar_file=f'{cwd}/R1117v2.tar.gz',
                   N=2)
 
 ###############################################################################
-# R1126
+# R1126 ~212s/pdb
 ###############################################################################
 
 run_all_on_target(tar_file=f'{cwd}/R1126.tar.gz',
@@ -146,13 +147,13 @@ run_all_on_target(tar_file=f'{cwd}/R1126.tar.gz',
                   name="R1126",
                   EM=True,
                   prepare=False,
-                  run=False,
+                  run=True,
                   resolution={f'{cwd}/R1126_structure_21.mrc': 5.6},
                   threshold={f'{cwd}/R1126_structure_21.mrc': 0.11},
-                  N=3)
+                  N=2)
 
 ###############################################################################
-# R1128
+# R1128 ~180s/pdb
 ###############################################################################
 
 run_all_on_target(tar_file=f'{cwd}/R1128.tar.gz',
@@ -161,13 +162,13 @@ run_all_on_target(tar_file=f'{cwd}/R1128.tar.gz',
                   name="R1128",
                   EM=True,
                   prepare=False,
-                  run=False,
+                  run=True,
                   resolution={f'{cwd}/R1128_structure_24.mrc': 5.3},
                   threshold={f'{cwd}/R1128_structure_24.mrc': 0.124},
                   N=2)
 
 ###############################################################################
-# R1136
+# R1136 ~155s/pdb
 ###############################################################################
 
 run_all_on_target(tar_file=f'{cwd}/R1136.tar.gz',
@@ -177,7 +178,7 @@ run_all_on_target(tar_file=f'{cwd}/R1136.tar.gz',
                   name="R1136",
                   EM=True,
                   prepare=False,
-                  run=False,
+                  run=True,
                   resolution={f'{cwd}/R1136v1_structure_22.mrc': 4.4,
                               f'{cwd}/R1136v2_Apta-FRET-unbound.mrc': 4.5},
                   threshold={f'{cwd}/R1136v1_structure_22.mrc': 0.11,
@@ -195,7 +196,7 @@ run_all_on_target(tar_file=f'{cwd}/R1138.tar.gz',
                   name="R1138",
                   EM=True,
                   prepare=False,
-                  run=False,
+                  run=True,
                   resolution={f'{cwd}/R1138v1_structure_23.mrc': 5.2,
                               f'{cwd}/R1138v2_6HBC-Mature.mrc': 4.9},
                   threshold={f'{cwd}/R1138v1_structure_23.mrc': 0.1,
@@ -212,7 +213,7 @@ run_all_on_target(tar_file=f'{cwd}/R1149.tar.gz',
                   name="R1149",
                   EM=True,
                   prepare=False,
-                  run=False,
+                  run=True,
                   center=True,
                   resolution={f'{cwd}/R11149.mrc': 4.74},
                   threshold={f'{cwd}/R11149.mrc': 0.345},
@@ -231,7 +232,7 @@ run_all_on_target(tar_file=f'{cwd}/R1156.tar.gz',
                   name="R1156",
                   EM=True,
                   prepare=False,
-                  run=False,
+                  run=True,
                   center=True,
                   resolution={f'{cwd}/R1156_conformation1_resolution5.83.mrc': 5.83,
                               f'{cwd}/R1156_conformation2_resolution6.59.mrc': 6.59,
@@ -253,7 +254,7 @@ run_all_on_target(tar_file=f'{cwd}/R1189.tar.gz',
                   models_folder=f'{cwd}/R1189',
                   name="R1189",
                   prepare=False,
-                  run=False,
+                  run=True,
                   N=2)
 
 run_all_on_target(tar_file=f'{cwd}/RT1189.tar.gz',
@@ -274,7 +275,7 @@ run_all_on_target(tar_file=f'{cwd}/R1190.tar.gz',
                   models_folder=f'{cwd}/R1190',
                   name="R1190",
                   prepare=False,
-                  run=False,
+                  run=True,
                   N=2)
 
 run_all_on_target(tar_file=f'{cwd}/RT1190.tar.gz',
@@ -301,6 +302,9 @@ metrics = {'angle_outlier': 'min', 'avg_suitness': 'max', 'suite_outlier': 'min'
            'tempy_smoc_1': 'max'}
 
 concat_all_result_files(glob('result_files/*scores.csv'), "all_scores.csv")
+concat_all_result_files(glob('result_files/*per_residue.csv'), "all_per_residue.csv")
+concat_all_result_files(glob('result_files/*per_threshold.csv'), "all_per_threshold.csv")
+
 df = pd.read_csv("all_scores.csv")
 columns = ['target', 'gr_code', 'model', 'emmap', ]
 df = reduce_df(df, score_to_choice_best=None, static_columns=columns, metric_dict=metrics)
