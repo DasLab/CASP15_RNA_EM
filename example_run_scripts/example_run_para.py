@@ -22,8 +22,14 @@ def run_all_on_target(tar_file, natives, models_folder, name,
         if path.isdir(models_folder):
             system(f'rm -r {models_folder}')
         system(f'tar -xf {tar_file}')
-        for x in glob(f'{models_folder}/*'):
-            y = f'{x.rsplit("/",1)[0]}/{x.rsplit("/",1)[-1][:12]}'
+        for x in glob(f'{models_folder}/*TS*'):
+            xname = x.rsplit("/",1)[-1]
+            if xname[:len(name)]!=name:
+                xname = f'{name}TS{xname.rsplit("TS",1)[-1]}'
+            if len(xname) == len(name)+5:
+                # missing model
+                xname = xname+"_1"
+            y = f'{x.rsplit("/",1)[0]}/{xname[:len(name)+7]}'
             if x!=y:
                 system(f'mv {x} {y}')
         if EM:
@@ -46,15 +52,15 @@ def run_all_on_target(tar_file, natives, models_folder, name,
                         if center:
                             center_map_and_native(emmap, native)
                         print(f'Scoring models (EM) in {models_folder}, {native}, {emmap}.')
-                        write_and_sbatch_scoring(pdbs, N, f'run_files/run_{name}', name, base_sbatch, f"result_files/{name}_{i}-{j}", native, usalign_location=usalign_location, chimerax_location=chimerax_location, EM=EM, emmap=emmap, resolution=resolution[emmap], threshold=threshold[emmap], phenix_location=phenix_location, sbatch=sbatch)
+                        write_and_sbatch_scoring(pdbs, N, f'run_files/run_{name}_{i}-{j}', name, base_sbatch, f"result_files/{name}_{i}-{j}", native, usalign_location=usalign_location, chimerax_location=chimerax_location, EM=EM, emmap=emmap, resolution=resolution[emmap], threshold=threshold[emmap], phenix_location=phenix_location, sbatch=sbatch)
                     else:
                         print(f'Scoring models in {models_folder}, {native}, {emmap}.')
-                        write_and_sbatch_scoring(pdbs, N, f'run_files/run_{name}', name, base_sbatch, f"result_files/{name}_{i}-{j}", native, usalign_location=usalign_location, EM=False, phenix_location=phenix_location, sbatch=sbatch)
+                        write_and_sbatch_scoring(pdbs, N, f'run_files/run_{name}_{i}-{j}', name, base_sbatch, f"result_files/{name}_{i}-{j}", native, usalign_location=usalign_location, EM=False, phenix_location=phenix_location, sbatch=sbatch)
         else:
             for i, native in enumerate(natives):
                 native = f'{models_folder}/{name}TSexp_{i}.pdb'
                 print(f'Scoring models in {models_folder}, {native}.')
-                write_and_sbatch_scoring(pdbs, N, f'run_files/run_{name}', name, base_sbatch, f"result_files/{name}_{i}", native, usalign_location=usalign_location, EM=EM, phenix_location=phenix_location, sbatch=sbatch)
+                write_and_sbatch_scoring(pdbs, N, f'run_files/run_{name}_{i}', name, base_sbatch, f"result_files/{name}_{i}", native, usalign_location=usalign_location, EM=EM, phenix_location=phenix_location, sbatch=sbatch)
 
 
 ###############################################################################
@@ -77,7 +83,7 @@ run_all_on_target(tar_file=f'{cwd}/R1107.tar.gz',
 
 run_all_on_target(tar_file=f'{cwd}/R1108.tar.gz',
                   natives=[f'{cwd}/D_1292119797_model-annotate_P1chimp_A.pdb',
-                           f'{cwd}/D_1292119797_model-annotate_P1chimp_A.pdb'],
+                           f'{cwd}/D_1292119797_model-annotate_P1chimp_B.pdb'],
                   models_folder=f'{cwd}/R1108',
                   name="R1108",
                   prepare=False,
@@ -135,7 +141,7 @@ run_all_on_target(tar_file=f'{cwd}/R1126.tar.gz',
                   name="R1126",
                   EM=True,
                   prepare=False,
-                  run=True,
+                  run=False,
                   base_sbatch=f'{cwd}/../CASP15_RNA_EM/example_run_scripts/example.sbatch',
                   sbatch=True,
                   resolution={f'{cwd}/R1126_structure_21.mrc': 5.6},
@@ -152,7 +158,7 @@ run_all_on_target(tar_file=f'{cwd}/R1128.tar.gz',
                   name="R1128",
                   EM=True,
                   prepare=False,
-                  run=True,
+                  run=False,
                   base_sbatch=f'{cwd}/../CASP15_RNA_EM/example_run_scripts/example.sbatch',
                   sbatch=True,
                   resolution={f'{cwd}/R1128_structure_24.mrc': 5.3},
@@ -170,7 +176,7 @@ run_all_on_target(tar_file=f'{cwd}/R1136.tar.gz',
                   name="R1136",
                   EM=True,
                   prepare=False,
-                  run=True,
+                  run=False,
                   resolution={f'{cwd}/R1136v1_structure_22.mrc': 4.4,
                               f'{cwd}/R1136v2_Apta-FRET-unbound.mrc': 4.5},
                   threshold={f'{cwd}/R1136v1_structure_22.mrc': 0.11,
@@ -190,7 +196,7 @@ run_all_on_target(tar_file=f'{cwd}/R1138.tar.gz',
                   name="R1138",
                   EM=True,
                   prepare=False,
-                  run=True,
+                  run=False,
                   resolution={f'{cwd}/R1138v1_structure_23.mrc': 5.2,
                               f'{cwd}/R1138v2_6HBC-Mature.mrc': 4.9},
                   threshold={f'{cwd}/R1138v1_structure_23.mrc': 0.1,
@@ -209,7 +215,7 @@ run_all_on_target(tar_file=f'{cwd}/R1149.tar.gz',
                   name="R1149",
                   EM=True,
                   prepare=False,
-                  run=True,
+                  run=False,
                   center=True,
                   resolution={f'{cwd}/R11149.mrc': 4.74},
                   threshold={f'{cwd}/R11149.mrc': 0.345},
@@ -229,7 +235,7 @@ run_all_on_target(tar_file=f'{cwd}/R1156.tar.gz',
                   models_folder=f'{cwd}/R1156',
                   name="R1156",
                   EM=True,
-                  prepare=False,
+                  prepare=True,
                   run=True,
                   center=True,
                   resolution={f'{cwd}/R1156_conformation1_resolution5.83.mrc': 5.83,

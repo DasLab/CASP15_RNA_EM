@@ -9,12 +9,7 @@ from glob import glob
 # TODO
 ###############################################################################
 # code
-#   update images in document and folder
 #   move in visualization code for all_per_thershold and all_per_residue
-
-# Testing
-#   test sbatch on sherlock
-#   production run
 
 # Documentation
 #   docstring
@@ -47,6 +42,16 @@ def run_all_on_target(tar_file, natives, models_folder, name,
         if path.isdir(models_folder):
             system(f'rm -r {models_folder}')
         system(f'tar -xf {tar_file}')
+        for x in glob(f'{models_folder}/*TS*'):
+            xname = x.rsplit("/",1)[-1]
+            if xname[:len(name)]!=name:
+                xname = f'{name}TS{xname.rsplit("TS",1)[-1]}'
+            if len(xname) == len(name)+5:
+                # missing model
+                xname = xname+"_1"
+            y = f'{x.rsplit("/",1)[0]}/{xname[:len(name)+7]}'
+            if x!=y:
+                system(f'mv {x} {y}')
         for x in glob(f'{models_folder}/*'):
             y = f'{x.rsplit("/",1)[0]}/{x.rsplit("/",1)[-1][:12]}'
             if x!=y:
@@ -102,7 +107,7 @@ run_all_on_target(tar_file=f'{cwd}/R1107.tar.gz',
 
 run_all_on_target(tar_file=f'{cwd}/R1108.tar.gz',
                   natives=[f'{cwd}/D_1292119797_model-annotate_P1chimp_A.pdb',
-                           f'{cwd}/D_1292119797_model-annotate_P1chimp_A.pdb'],
+                           f'{cwd}/D_1292119797_model-annotate_P1chimp_B.pdb'],
                   models_folder=f'{cwd}/R1108',
                   name="R1108",
                   prepare=False,
@@ -316,7 +321,7 @@ df.to_csv('all_scores_best_per_conformation_per_model.csv', index=False)
 columns = ['target', 'gr_code', 'model']
 df = reduce_df(df, score_to_choice_best=None, static_columns=columns, metric_dict=metrics)
 df.to_csv('all_scores_best_per_model.csv', index=False)
-clean_columns = ['target', 'gr_code', 'model', 'cc_mask', 'cc_peaks', 'tempy_mi', 'tempy_smoc', 'ai', "tm", "gdt_ts"]
+clean_columns = ['target', 'gr_code', 'model', 'cc_mask', 'cc_peaks', 'tempy_mi', 'tempy_smoc', 'ai', "tm", "gdt_ts","clashscore"]
 df[clean_columns].to_csv('all_scores_best_per_model_clean.csv', index=False)
 
 columns = ['target', 'gr_code']
@@ -333,8 +338,8 @@ Z_topo = {"tm": 1 / 2, "gdt_ts": 1 / 2}
 df["Z_em"] = get_weighted_sum_z(df, Z_em, "Z_")
 df["Z_topo"] = get_weighted_sum_z(df, Z_topo, "Z_")
 df.to_csv('all_scores_best_per_group_withZ.csv', index=False)
-clean_columns = ['target', 'gr_code', 'cc_mask', 'cc_peaks', 'tempy_mi', 'tempy_smoc', 'ai', "tm", "gdt_ts",
-                 'Z_cc_mask', 'Z_cc_peaks', 'Z_tempy_mi', 'Z_tempy_smoc', 'Z_ai', "Z_tm", "Z_gdt_ts",
+clean_columns = ['target', 'gr_code', 'cc_mask', 'cc_peaks', 'tempy_mi', 'tempy_smoc', 'ai', "tm", "gdt_ts","clashscore",
+                 'Z_cc_mask', 'Z_cc_peaks', 'Z_tempy_mi', 'Z_tempy_smoc', 'Z_ai', "Z_tm", "Z_gdt_ts","Z_clashscore",
                  'Z_em', 'Z_topo']
 df[clean_columns].to_csv('all_scores_best_per_group_withZ_clean.csv', index=False)
 

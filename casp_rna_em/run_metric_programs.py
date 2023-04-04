@@ -211,7 +211,7 @@ def run_tempy(pdb, emmap, resolution):
             score_dict['tempy_smoc_per_residue'].append(score)
             score_dict['tempy_smoc_1_per_residue'].append(SMOC_1[0][chain][res])
     score_dict['tempy_smoc'] = sum(score_dict['tempy_smoc_per_residue']) / len(score_dict['tempy_smoc_per_residue'])
-    score_dict['tempy_smoc1'] = sum(score_dict['tempy_smoc_1_per_residue']) / len(score_dict['tempy_smoc_1_per_residue'])
+    score_dict['tempy_smoc_1'] = sum(score_dict['tempy_smoc_1_per_residue']) / len(score_dict['tempy_smoc_1_per_residue'])
     return score_dict
 
 
@@ -349,8 +349,8 @@ def parse_phenix_cc(result_file):
 def parse_lga(result_file):
     score_dict = {'gdt_ts': np.nan, 'rmsd_lga': np.nan}
     if result_file is not None:
-        with open(result_file, 'r') as f:
-            lines = f.readlines()
+        with open(result_file, 'r',errors='replace') as f:
+            lines = f.readlines() # error on some
             for row in lines:
                 if "SUMMARY(GDT)" == row[:12]:
                     score_dict['gdt_ts'] = row.split()[6]
