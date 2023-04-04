@@ -47,6 +47,10 @@ def run_all_on_target(tar_file, natives, models_folder, name,
         if path.isdir(models_folder):
             system(f'rm -r {models_folder}')
         system(f'tar -xf {tar_file}')
+        for x in glob(f'{models_folder}/*'):
+            y = f'{x.rsplit("/",1)[0]}/{x.rsplit("/",1)[-1][:12]}'
+            if x!=y:
+                system(f'mv {x} {y}')
         if EM:
             for i, emmap in enumerate(natives):
                 for j, native in enumerate(natives[emmap]):

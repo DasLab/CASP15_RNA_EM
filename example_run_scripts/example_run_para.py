@@ -4,10 +4,8 @@ import numpy as np
 import pandas as pd
 from glob import glob
 
-# TODO
-#   for all targets
-#   combine output after run -- new script
-
+# prepare by copying over all expiremental data and model tars
+# make a run_files and result_files folder
 
 usalign_location = '/home/groups/rhiju/philpham/casp15/us-align/'
 chimerax_location = '/home/groups/rhiju/rkretsch/chimerax-1.3/bin/'
@@ -24,6 +22,10 @@ def run_all_on_target(tar_file, natives, models_folder, name,
         if path.isdir(models_folder):
             system(f'rm -r {models_folder}')
         system(f'tar -xf {tar_file}')
+        for x in glob(f'{models_folder}/*'):
+            y = f'{x.rsplit("/",1)[0]}/{x.rsplit("/",1)[-1][:12]}'
+            if x!=y:
+                system(f'mv {x} {y}')
         if EM:
             for i, emmap in enumerate(natives):
                 for j, native in enumerate(natives[emmap]):
@@ -133,7 +135,7 @@ run_all_on_target(tar_file=f'{cwd}/R1126.tar.gz',
                   name="R1126",
                   EM=True,
                   prepare=False,
-                  run=False,
+                  run=True,
                   base_sbatch=f'{cwd}/../CASP15_RNA_EM/example_run_scripts/example.sbatch',
                   sbatch=True,
                   resolution={f'{cwd}/R1126_structure_21.mrc': 5.6},
@@ -150,7 +152,7 @@ run_all_on_target(tar_file=f'{cwd}/R1128.tar.gz',
                   name="R1128",
                   EM=True,
                   prepare=False,
-                  run=False,
+                  run=True,
                   base_sbatch=f'{cwd}/../CASP15_RNA_EM/example_run_scripts/example.sbatch',
                   sbatch=True,
                   resolution={f'{cwd}/R1128_structure_24.mrc': 5.3},
@@ -167,7 +169,7 @@ run_all_on_target(tar_file=f'{cwd}/R1136.tar.gz',
                   models_folder=f'{cwd}/R1136',
                   name="R1136",
                   EM=True,
-                  prepare=True,
+                  prepare=False,
                   run=True,
                   resolution={f'{cwd}/R1136v1_structure_22.mrc': 4.4,
                               f'{cwd}/R1136v2_Apta-FRET-unbound.mrc': 4.5},
@@ -187,7 +189,7 @@ run_all_on_target(tar_file=f'{cwd}/R1138.tar.gz',
                   models_folder=f'{cwd}/R1138',
                   name="R1138",
                   EM=True,
-                  prepare=True,
+                  prepare=False,
                   run=True,
                   resolution={f'{cwd}/R1138v1_structure_23.mrc': 5.2,
                               f'{cwd}/R1138v2_6HBC-Mature.mrc': 4.9},
@@ -206,7 +208,7 @@ run_all_on_target(tar_file=f'{cwd}/R1149.tar.gz',
                   models_folder=f'{cwd}/R1149',
                   name="R1149",
                   EM=True,
-                  prepare=True,
+                  prepare=False,
                   run=True,
                   center=True,
                   resolution={f'{cwd}/R11149.mrc': 4.74},
@@ -227,7 +229,7 @@ run_all_on_target(tar_file=f'{cwd}/R1156.tar.gz',
                   models_folder=f'{cwd}/R1156',
                   name="R1156",
                   EM=True,
-                  prepare=True,
+                  prepare=False,
                   run=True,
                   center=True,
                   resolution={f'{cwd}/R1156_conformation1_resolution5.83.mrc': 5.83,
@@ -251,8 +253,8 @@ run_all_on_target(tar_file=f'{cwd}/R1189.tar.gz',
                   natives=[f'{cwd}/RT1189_A-6B.pdb'],
                   models_folder=f'{cwd}/R1189',
                   name="R1189",
-                  prepare=True,
-                  run=True,
+                  prepare=False,
+                  run=False,
                   base_sbatch=f'{cwd}/../CASP15_RNA_EM/example_run_scripts/example.sbatch',
                   sbatch=True,
                   N=3)
@@ -261,11 +263,11 @@ run_all_on_target(tar_file=f'{cwd}/RT1189.tar.gz',
                   natives=[f'{cwd}/RT1189_A-6B.pdb'],
                   models_folder=f'{cwd}/RT1189',
                   name="RT1189",
-                  prepare=True,
-                  run=True,
+                  prepare=False,
+                  run=False,
                   base_sbatch=f'{cwd}/../CASP15_RNA_EM/example_run_scripts/example.sbatch',
                   sbatch=True,
-                  N=3)
+                  N=10)
 
 
 ###############################################################################
@@ -277,8 +279,8 @@ run_all_on_target(tar_file=f'{cwd}/R1190.tar.gz',
                   natives=[f'{cwd}/RT1190_A-4B.pdb'],
                   models_folder=f'{cwd}/R1190',
                   name="R1190",
-                  prepare=True,
-                  run=True,
+                  prepare=False,
+                  run=False,
                   base_sbatch=f'{cwd}/../CASP15_RNA_EM/example_run_scripts/example.sbatch',
                   sbatch=True,
                   N=3)
@@ -287,9 +289,9 @@ run_all_on_target(tar_file=f'{cwd}/RT1190.tar.gz',
                   natives=[f'{cwd}/RT1190_A-4B.pdb'],
                   models_folder=f'{cwd}/RT1190',
                   name="RT1190",
-                  prepare=True,
-                  run=True,
+                  prepare=False,
+                  run=False,
                   base_sbatch=f'{cwd}/../CASP15_RNA_EM/example_run_scripts/example.sbatch',
                   sbatch=True,
-                  N=2)
+                  N=10)
 

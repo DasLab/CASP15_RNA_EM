@@ -1,5 +1,21 @@
 import pandas as pd
-from casp_rna_em.process_files import reduce_df, get_zscore, get_weighted_sum_z
+from glob import glob
+from casp_rna_em.process_files import reduce_df, get_zscore, get_weighted_sum_z, concat_all_result_files
+
+###############################################################################
+# Combine all
+###############################################################################
+
+metrics = {'angle_outlier': 'min', 'avg_suitness': 'max', 'suite_outlier': 'min',
+           'bond_outlier': 'min', 'clashscore': 'min', 'pucker_outlier': 'min',
+           'rmsd_lga': 'min', 'gdt_ts': 'max', 'rmsd_usalign': 'min', 'tm': 'max',
+           'cc_volume': 'max', 'cc_mask': 'max', 'cc_peaks': 'max',
+           'ai': 'max', 'ai_bb': 'max', 'ai_base': 'max', 'do': 'max',
+           'do_bb': 'max', 'do_base': 'max',
+           'tempy_ccc': 'max', 'tempy_mi': 'max',
+           'tempy_lsf': 'max', 'tempy_env': 'max',
+           'tempy_sccc': 'max', 'tempy_smoc': 'max',
+           'tempy_smoc_1': 'max'}
 
 concat_all_result_files(glob('result_files/*scores.csv'), "all_scores.csv")
 concat_all_result_files(glob('result_files/*per_residue.csv'), "all_per_residue.csv")

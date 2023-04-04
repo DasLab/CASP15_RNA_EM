@@ -9,5 +9,7 @@
 #SBATCH -N 1
 
 ulimit -s unlimited; lga
+module load system
+module load mesa
 module load gcc/12.1.0
 
