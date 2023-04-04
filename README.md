@@ -9,7 +9,11 @@ For the CASP15 RNA category, we aimed to assess predictions by directly comparin
 
 To install all necessary python packages, in this repository run:
 
-`conda env create -f environment.yml`
+```
+conda env create -f environment.yml
+conda activate casp_rna_em
+pip install .
+```
 
 This will also install [__TEMPy__](https://doi.org/10.1107/s2059798320014928) and [__rna-tools__](https://rna-tools.readthedocs.io/en/latest/).
 
