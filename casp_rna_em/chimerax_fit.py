@@ -1,4 +1,4 @@
-# chimerax_search_fit.py PDB.pdb MRC.mrc out.pdb threhsold
+# ChimeraX --nogui --script 'chimerax_search_fit.py PDBin MRCin PDBout threhsold'
 
 from chimerax.core.commands import run
 import sys

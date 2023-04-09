@@ -1,4 +1,5 @@
 # casp_rna_score_all_from_file
+# enables command easy command line call for score_all_from_file
 from casp_rna_em.run_metric_programs import score_all_from_file
 import argparse
 
@@ -19,9 +20,18 @@ if __name__ == '__main__':
     args = argParser.parse_args()
 
     if args.EM:
-        score_all_from_file(file=args.file, out_file_prefix=args.out_file_prefix, native=args.native,
-                            usalign_location=args.usalign_location, chimerax_location=args.chimerax_location, EM=args.EM, emmap=args.emmap,
-                            resolution=args.resolution, threshold=args.threshold, phenix_location=args.phenix_location)
+        score_all_from_file(file=args.file,
+                            out_file_prefix=args.out_file_prefix,
+                            native=args.native,
+                            usalign_location=args.usalign_location,
+                            chimerax_location=args.chimerax_location,
+                            EM=args.EM, emmap=args.emmap,
+                            resolution=args.resolution,
+                            threshold=args.threshold,
+                            phenix_location=args.phenix_location)
     else:
-        score_all_from_file(file=args.file, out_file_prefix=args.out_file_prefix, native=args.native,
-                            usalign_location=args.usalign_location, EM=args.EM, phenix_location=args.phenix_location)
+        score_all_from_file(file=args.file,
+                            out_file_prefix=args.out_file_prefix,
+                            native=args.native,
+                            usalign_location=args.usalign_location, EM=args.EM,
+                            phenix_location=args.phenix_location)
