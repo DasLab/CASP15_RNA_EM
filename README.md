@@ -90,6 +90,9 @@ For CASP15, we ranked based on Zscore. For each target and metric a Zscore was c
 ### Visualizations
 Visualizations used in the manuscript can be found in `results/rna_results.ipynb`. Further, chimerax sessions to create the figures can be found in this folder, and the maps and models related to these files can be found [here](https://drive.google.com/file/d/1b6ZZXznF2zvvdVO1PuSEmxmOLnh2yJQY/view?usp=share_link).
 
+### Analysis of R1149 R1156
+
+For the CASP15 RNA expirementalist paper, R1149 and R1556 were analysed in detail including all models junction geometry and angle. This analysis is in the `R1149_R1156_analysis` folder.
 
 ## References
 CASP15 papers are in preperation
