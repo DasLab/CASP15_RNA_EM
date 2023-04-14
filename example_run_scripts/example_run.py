@@ -404,11 +404,16 @@ df = reduce_df(df, score_to_choice_best=None,
                static_columns=columns, metric_dict=metrics)
 df.to_csv('all_scores_best_per_group.csv', index=False)
 
-# for each metric and target, calculate Z-scores
-for metric in metrics.keys():
-    df["Z_" + metric] = get_zscore(df[metric].to_numpy(copy=True),
-                                   negative=(metrics[metric] == "min"),
-                                   threshold=-2)
+# for each metric and puzzle, calcualte Z-scores
+temp_dfs = []
+for target in temp_df.target.unique():
+    target_df = df[df.target==target].copy()
+    for metric in metrics.keys():
+        target_df["Z_"+metric] = get_zscore(target_df[metric].to_numpy(copy=True),
+                                            negative=(METRICS[metric]=="min"),
+                                            threshold=-2)
+    temp_dfs.append(target_df)
+df = pd.concat(temp_dfs)
 
 # get weighted sum Zs of interest
 # save a clean version with only scores of interest
