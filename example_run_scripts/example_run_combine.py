@@ -18,17 +18,18 @@ metrics = {'angle_outlier': 'min', 'avg_suitness': 'max', 'clashscore': 'min',
            'tempy_lsf': 'max', 'tempy_env': 'max',
            'tempy_sccc': 'max', 'tempy_smoc': 'max',
            'tempy_smoc_1': 'max'}
-
+           
 # combine all
-concat_all_result_files(glob('result_files/*scores.csv'), "all_scores.csv")
-concat_all_result_files(
-    glob('result_files/*per_residue.csv'), "all_per_residue.csv")
-concat_all_result_files(
-    glob('result_files/*per_threshold.csv'), "all_per_threshold.csv")
+concat_all_result_files(glob(f'{cwd}/result_files/*scores.csv'),
+                        "all_scores.csv")
+concat_all_result_files(glob(f'{cwd}/result_files/*per_residue.csv'),
+                        "all_per_residue.csv")
+concat_all_result_files(glob(f'{cwd}/result_files/*per_threshold.csv'),
+                        "all_per_threshold.csv")
 
 # reduce to one score per model per conformation
 df = pd.read_csv("all_scores.csv")
-columns = ['target', 'gr_code', 'model', 'emmap', ]
+columns = ['target', 'gr_code', 'model', 'emmap']
 df = reduce_df(df, score_to_choice_best=None,
                static_columns=columns, metric_dict=metrics)
 df.to_csv('all_scores_best_per_conformation_per_model.csv', index=False)
@@ -59,7 +60,7 @@ for target in temp_df.target.unique():
                                             threshold=-2)
     temp_dfs.append(target_df)
 df = pd.concat(temp_dfs)
-    
+
 # get weighted sum Zs of interest
 # save a clean version with only scores of interest
 Z_em = {'cc_mask': 1 / 5, 'cc_peaks': 1 / 5,
@@ -75,3 +76,4 @@ clean_columns = ['target', 'gr_code', 'cc_mask', 'cc_peaks', 'tempy_mi',
                  'Z_em', 'Z_topo']
 df[clean_columns].to_csv(
     'all_scores_best_per_group_withZ_clean.csv', index=False)
+

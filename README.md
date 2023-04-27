@@ -74,11 +74,11 @@ ulimit -s unlimited; lga
 
 ## Pipeline
 
-Examples of running the pipeline can be found in `example_run_scripts/` with a full run in `example_run.py` and then parralizable options compatible with a slurm computer cluster run with `example_run_para.py` followed by `example_run_para_combine.py` once all the calculations are done.
+Examples of running the pipeline can be found in `example_run_scripts/` with a full run in `example_run.py` and then parralizable options compatible with a slurm computer cluster run with `example_run_para.py`. To combine results from these runs, use the file followed by `example_run_combine.py` once all the calculations are done.
 
 ## Analysis
 
-Code can be found in `process_files.py`. With examples on how these steps were run `results/rna_results.ipynb`, `example_run_para_combine.py` and at the end of `example_run.py`.
+Code can be found in `process_files.py`. With examples on how these steps were run `results/rna_results.ipynb`, `example_run_combine.py`.
 
 ### Choosing best score
 
