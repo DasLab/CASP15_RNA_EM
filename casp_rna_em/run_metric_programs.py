@@ -779,7 +779,7 @@ def dock_pdb_usalign_fitmap(pdb, emmap, native, threshold, usalign_location='',
         output_pdb = f'{result_name}_usalignfitmapDOCKED.pdb'
     if result_file is None:
         result_file = f'{result_name}_usalignfitmapDOCKED.out'
-    run_usalign(pdb, native, usalign_location)
     usalign_output_pdb = f'{result_name}_USALIGN.pdb'
+    run_usalign(pdb, native, usalign_location,output_pdb=usalign_output_pdb[:-4])
     system(f'{chimerax_location}ChimeraX --nogui --script "{path.dirname(__file__)}/chimerax_fit.py {usalign_output_pdb} {emmap} {output_pdb} {threshold}" > {result_file}')
     return {'docked': 'usalign-fitmap'}
