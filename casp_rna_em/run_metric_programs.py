@@ -7,7 +7,8 @@ from tqdm import tqdm
 
 def score_all(pdbs, out_file_prefix, native, usalign_location='',
               chimerax_location='', EM=True, emmap=None,
-              resolution=None, threshold=None, phenix_location=""):
+              resolution=None, threshold=None, phenix_location="",
+              CASP_naming=True):
     '''
     Take a list of pdbs, score all of them, and write results file
 
@@ -38,6 +39,7 @@ def score_all(pdbs, out_file_prefix, native, usalign_location='',
         score_dict.update(run_lga(pdb, native, atom='C4,'))
         score_dict.update(run_usalign(
             pdb, native, usalign_location=usalign_location))
+        score_dict.update(run_inf(pdb,native))
 
         if EM:
             # TODO add skip USalign if that pdb already exists.
@@ -72,9 +74,10 @@ def score_all(pdbs, out_file_prefix, native, usalign_location='',
     df['native'] = native.rsplit('/', 1)[-1]
     if EM:
         df['emmap'] = emmap.rsplit('/', 1)[-1]
-    df['target'] = df.pdb.apply(lambda x: x.split('TS')[0])
-    df['gr_code'] = df.pdb.apply(lambda x: x.split('TS')[1].split("_")[0])
-    df['model'] = df.pdb.str[-1]
+    if CASP_naming:
+        df['target'] = df.pdb.apply(lambda x: x.split('TS')[0])
+        df['gr_code'] = df.pdb.apply(lambda x: x.split('TS')[1].split("_")[0])
+        df['model'] = df.pdb.str[-1]
     df.to_csv(f"{out_file_prefix}_scores.csv", index=False)
 
     per_res = pd.DataFrame(per_residue_scores).transpose()
@@ -408,6 +411,21 @@ def run_usalign(pdb, native, usalign_location='', output_pdb=None,
     out_file.close()
     return parse_usalign(result_file)
 
+
+def run_inf(pdb, native):
+    # rna_calc_inf.py rna_calc_rmsd.py
+    result_name = f'{pdb.rsplit(".",1)[0]}_{native.rsplit(".",1)[0].rsplit("/",1)[-1]}'
+    output_inf = f'{result_name}_INF.out' 
+    command = ['rna_calc_inf.py','-o',output_inf,'-t',native,pdb] # can also do multiple pdb
+    p = sp.Popen(command,stdout=sp.PIPE,stderr=sp.PIPE)
+    out,err = p.communicate()
+    if p.returncode:
+        print(f'ERROR unf faile don {pdb}\n{err.decode()}')
+    return parse_inf(output_inf)
+
+def parse_inf(result_file):
+    df = pd.read_csv(result_file)
+    return df.drop(columns=['target','fn']).to_dict(orient='index')[0]
 
 ###############################################################################
 # Parsing of output files
