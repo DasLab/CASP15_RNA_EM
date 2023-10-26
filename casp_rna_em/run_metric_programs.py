@@ -270,6 +270,13 @@ def run_Qscore(pdb, emmap, mapq_script, chimera_location, resolution,
                   'q_base_by_residue': []}
     command = ['timeout', timeout, 'python', mapq_script, chimera_location,
                emmap, pdb, f'res={resolution}', f'np={threads}']
+    out_file = open(result_file, 'w')
+    p = sp.Popen(command, stdout=out_file, stderr=sp.PIPE)
+    out, err = p.communicate()
+    if p.returncode:
+        print(f'ERROR: Qscore failed: on {pdb}\n{err.decode()}')
+        result_file = None
+    out_file.close()
     ''' 
     timeout 3600 $python_exec ${mapq_location}mapq_cmd.py $chimera_location ${cryoem_map}_CENTERED.mrc ${f}_DOCKED.pdb res=$resolution
     BACKBONE_ATOMS = ['P','OP1','OP2',\"O5'\",\"C5'\",\"C4'\",\"O4'\",\"C3'\",\"O3'\",\"C2'\",\"O2'\",\"C1'\"]
