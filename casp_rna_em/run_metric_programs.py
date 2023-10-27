@@ -264,11 +264,14 @@ def run_atomic_inclusion(pdb, emmap, threshold, chimerax_location='',
 
 def run_Qscore(pdb, emmap, mapq_script, chimera_location, resolution,
                result_file=None, timeout=3600, threads=16):
+    prefix = f'{pdb.rsplit(".",1)[0]}'
+    if result_file is None:
+        result_file = f'{prefix}_Q.out' 
     # TODO likely including new script?
     score_dict = {"q": np.nan, "q_bb": np.nan, "q_base": np.nan,
                   'q_by_residue': [], 'g_bb_by_residue': [],
                   'q_base_by_residue': []}
-    command = ['timeout', timeout, 'python', mapq_script, chimera_location,
+    command = ['timeout', str(timeout), 'python', mapq_script, chimera_location,
                emmap, pdb, f'res={resolution}', f'np={threads}']
     out_file = open(result_file, 'w')
     p = sp.Popen(command, stdout=out_file, stderr=sp.PIPE)
@@ -277,16 +280,22 @@ def run_Qscore(pdb, emmap, mapq_script, chimera_location, resolution,
         print(f'ERROR: Qscore failed: on {pdb}\n{err.decode()}')
         result_file = None
     out_file.close()
-    ''' 
-    timeout 3600 $python_exec ${mapq_location}mapq_cmd.py $chimera_location ${cryoem_map}_CENTERED.mrc ${f}_DOCKED.pdb res=$resolution
-    BACKBONE_ATOMS = ['P','OP1','OP2',\"O5'\",\"C5'\",\"C4'\",\"O4'\",\"C3'\",\"O3'\",\"C2'\",\"O2'\",\"C1'\"]
+
+    qscore_file = f'{emmap.rsplit('/',1)[0]}/{pdb.rsplit('/',1)[1]}__Q__{emmap.rsplit('/',1)[1]}.csv'
+
+    cols = ['atom_name','residue_number','residue_name','x_coord','y_coord','z_coord','Qscore']
+    df = pd.read_csv(qscore_file,columns=cols)
+    df_heavy = df['H' not in df.atom_name]
+    BACKBONE_ATOMS = ['P','OP1','OP2',"O5'","C5'","C4'","O4'","C3'","O3'","C2'","O2'","C1'"]
     df_heavy_backbone = df_heavy[df_heavy.atom_name.isin(BACKBONE_ATOMS)]
     df_heavy_base = df_heavy[~df_heavy.atom_name.isin(BACKBONE_ATOMS)]
     df_heavy.b_factor[df_heavy.b_factor<0] = 0
     df_heavy_backbone.b_factor[df_heavy_backbone.b_factor<0] = 0
     df_heavy_base.b_factor[df_heavy_base.b_factor<0] = 0
     print('Average Q pos:',df_heavy.b_factor.mean())
-    per_nuc_Q = df_heavy.rename(columns={'b_factor':'Q'}).groupby('residue_number').mean().Q
+    per_nuc_Q = df_heavy.rename(columns={'b_factor':'Q'}).groupby('residue_number').mean().Qscore
+    ''' 
+    timeout 3600 $python_exec ${mapq_location}mapq_cmd.py $chimera_location ${cryoem_map}_CENTERED.mrc ${f}_DOCKED.pdb res=$resolution
     Note this is a fork of the main mapq repository enabeling multiple q-score calculation in parralel and tabular output in the command-line tool.
     `git clone https://github.com/rkretsch/mapq.git`
 
