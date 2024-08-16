@@ -9,7 +9,8 @@ from casp_rna_em.run_metric_programs import run_usalign
 
 
 def prepare_pdbs(pdbs, ignore_no_extension=False, fill_occupancy=True,
-                 fill_bfactor=True, remove_protein=True):
+                 fill_bfactor=True, remove_protein=True,
+                 res_remove=[]):
     '''
     Prepare all pdbs to ready for scoring
 
@@ -24,7 +25,7 @@ def prepare_pdbs(pdbs, ignore_no_extension=False, fill_occupancy=True,
         list of pdbs which have now been prepared
     '''
     pdbs = glob(pdbs)
-
+    # print(pdbs)
     # only look at file with pdb extension
     # or if have no extension, assume pdb, .pdb
     if ignore_no_extension:
@@ -43,16 +44,17 @@ def prepare_pdbs(pdbs, ignore_no_extension=False, fill_occupancy=True,
     # clean each pdb
     for pdb in pdbs:
         clean_pdb(pdb, fill_occupancy=fill_occupancy,
-                  fill_bfactor=fill_bfactor, remove_protein=remove_protein)
+                  fill_bfactor=fill_bfactor, remove_protein=remove_protein,
+                  res_remove=res_remove)
     return pdbs
 
 
 def clean_pdb(pdb, fill_occupancy=True, fill_bfactor=True,
-              remove_protein=True):
+              remove_protein=True,res_remove=[]):
     '''
     Helper function of prepare+pdbs, refer above for arguments
     '''
-    if fill_occupancy or fill_bfactor or remove_protein:
+    if fill_occupancy or fill_bfactor or remove_protein or res_remove != []:
         ppdb = PandasPdb().read_pdb(pdb)
         # make all atoms have full occupanncy
         if fill_occupancy:
@@ -69,6 +71,10 @@ def clean_pdb(pdb, fill_occupancy=True, fill_bfactor=True,
                 print(f'Removed {removed_residues} from {pdb}')
             ppdb.df['ATOM'] = at_df[at_df.residue_name.isin(
                 RNA_nucs)]
+        at_df = ppdb.df['ATOM']
+        #print(len(ppdb.df['ATOM'].residue_number.unique()))
+        ppdb.df['ATOM'] = at_df[~at_df.residue_number.isin(res_remove)]
+        #print(len(ppdb.df['ATOM'].residue_number.unique()))
         ppdb.to_pdb(path=pdb)
 
     # use rna tools to prepare pdbs, action completed:

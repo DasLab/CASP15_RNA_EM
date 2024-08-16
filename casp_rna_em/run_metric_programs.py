@@ -137,7 +137,7 @@ def run_phenix_clashscore(pdb, phenix_location='', nuclear=True,
         dictionary of scores: clashscore
     '''
     if result_file is None:
-        result_file = f'{pdb.rsplit(".")[0]}_CLASHSCORE.out'
+        result_file = f'{pdb.rsplit(".",1)[0]}_CLASHSCORE.out'
     command = [f'{phenix_location}phenix.clashscore', pdb,
                f'nuclear={nuclear}', f'keep_hydrogens={keep_hydrogens}']
     out_file = open(result_file, 'w')
@@ -163,7 +163,7 @@ def run_phenix_rna_validate(pdb, phenix_location='', result_file=None):
         dictionary of scores: bond_outlier, angle_outlier, pucker_outlier, suite_outlier, avg_suitness
     '''
     if result_file is None:
-        result_file = f'{pdb.rsplit(".")[0]}_RNAVAL.out'
+        result_file = f'{pdb.rsplit(".",1)[0]}_RNAVAL.out'
     command = [f'{phenix_location}phenix.rna_validate', pdb]
     out_file = open(result_file, 'w')
     p = sp.Popen(command, stdout=out_file, stderr=sp.PIPE)
@@ -269,11 +269,12 @@ def run_Qscore(pdb, emmap, mapq_script, chimera_location, resolution,
         result_file = f'{prefix}_Q.out' 
     # TODO likely including new script?
     score_dict = {"q": np.nan, "q_bb": np.nan, "q_base": np.nan,
-                  'q_by_residue': [], 'g_bb_by_residue': [],
-                  'q_base_by_residue': []}
+                  'q_per_residue': [], 'q_bb_per_residue': [],
+                  'q_base_per_residue': []}
     command = ['timeout', str(timeout), 'python', mapq_script, chimera_location,
                emmap, pdb, f'res={resolution}', f'np={threads}']
     out_file = open(result_file, 'w')
+    print(command)
     p = sp.Popen(command, stdout=out_file, stderr=sp.PIPE)
     out, err = p.communicate()
     if p.returncode:
@@ -281,19 +282,23 @@ def run_Qscore(pdb, emmap, mapq_script, chimera_location, resolution,
         result_file = None
     out_file.close()
 
-    qscore_file = f'{emmap.rsplit('/',1)[0]}/{pdb.rsplit('/',1)[1]}__Q__{emmap.rsplit('/',1)[1]}.csv'
+    qscore_file = f"{pdb}__Q__{emmap.rsplit('/',1)[1]}.csv"
 
     cols = ['atom_name','residue_number','residue_name','x_coord','y_coord','z_coord','Qscore']
-    df = pd.read_csv(qscore_file,columns=cols)
-    df_heavy = df['H' not in df.atom_name]
+    df = pd.read_csv(qscore_file,names=cols)
+    df_heavy = df[~df.atom_name.str.contains('H')]
     BACKBONE_ATOMS = ['P','OP1','OP2',"O5'","C5'","C4'","O4'","C3'","O3'","C2'","O2'","C1'"]
     df_heavy_backbone = df_heavy[df_heavy.atom_name.isin(BACKBONE_ATOMS)]
     df_heavy_base = df_heavy[~df_heavy.atom_name.isin(BACKBONE_ATOMS)]
-    df_heavy.b_factor[df_heavy.b_factor<0] = 0
-    df_heavy_backbone.b_factor[df_heavy_backbone.b_factor<0] = 0
-    df_heavy_base.b_factor[df_heavy_base.b_factor<0] = 0
-    print('Average Q pos:',df_heavy.b_factor.mean())
-    per_nuc_Q = df_heavy.rename(columns={'b_factor':'Q'}).groupby('residue_number').mean().Qscore
+    # df_heavy.Qscore[df_heavy.Qscore<0] = 0
+    # df_heavy_backbone.Qscore[df_heavy_backbone.Qscore<0] = 0
+    # df_heavy_base.Qscore[df_heavy_base.Qscore<0] = 0
+    score_dict["q"] = df_heavy.Qscore.mean()
+    score_dict["q_per_residue"] = df_heavy.groupby('residue_number').Qscore.mean().to_list()
+    score_dict["q_bb"] = df_heavy_backbone.Qscore.mean()
+    score_dict["q_bb_per_residue"] = df_heavy_backbone.groupby('residue_number').Qscore.mean().to_list()
+    score_dict["q_base"] = df_heavy_base.Qscore.mean()
+    score_dict["q_base_per_residue"] = df_heavy_base.groupby('residue_number').Qscore.mean().to_list()
     ''' 
     timeout 3600 $python_exec ${mapq_location}mapq_cmd.py $chimera_location ${cryoem_map}_CENTERED.mrc ${f}_DOCKED.pdb res=$resolution
     Note this is a fork of the main mapq repository enabeling multiple q-score calculation in parralel and tabular output in the command-line tool.
@@ -417,7 +422,7 @@ def run_usalign(pdb, native, usalign_location='', output_pdb=None,
     if output_pdb is None:
         output_pdb = f'{result_name}_USALIGN'
     command = [f'{usalign_location}USalign', pdb, native,
-               '-outfmt', '2', '-o', output_pdb]
+               '-outfmt', '2', '-o', output_pdb, '-TMscore','1']
     out_file = open(result_file, 'w')
     p = sp.Popen(command, stdout=out_file, stderr=sp.PIPE)
     out, err = p.communicate()
